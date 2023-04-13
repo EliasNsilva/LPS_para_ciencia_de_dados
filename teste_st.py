@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from ml_models import train_model, randon_florest_models, svm_models, linear_models
 
 with st.form(key='my_form'):
     with st.sidebar:
@@ -16,6 +17,13 @@ with st.form(key='my_form'):
         bar_plot = st.checkbox('Grafico de barras')
         scatter_plot = st.checkbox('Grafico de dispersão')
         pair_plot = st.checkbox('Grafico de pares')
+        
+        st.subheader('Escolha os modelos de ML')
+        knn = st.checkbox('KNN')
+        svm = st.checkbox('SVM')
+        random_forest = st.checkbox('Random Forest')
+        logistic_regression = st.checkbox('Logistic Regression')
+
         st.form_submit_button("Submit")
 
 if file is not None:
@@ -55,6 +63,11 @@ if pair_plot:
     fig = plt.figure(figsize=(10, 6))
     sns.pairplot(df, hue=hue)
     st.pyplot(fig)
+
+if knn:
+    st.subheader('KNN')
+    target = st.selectbox("Escolha a coluna para o target", df.columns)
+    train_model(df, target)
 
 #st.sidebar.markdown("# Sidebar")
 
