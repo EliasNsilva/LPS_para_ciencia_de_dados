@@ -1,9 +1,7 @@
 import pandas as pd
-import seaborn as sns
 import streamlit as st
 import matplotlib.pyplot as plt
 from persist import load_widget_state
-from ml_models import train_model, randon_florest_models, svm_models, linear_models
 from plots import *
 
 st.set_page_config(page_title="LPS")
@@ -45,7 +43,7 @@ def main():
     if st.session_state.remove_page:
         del PAGES['settings']
     
-    page = st.sidebar.selectbox("Options", options = tuple(PAGES.keys()), format_func=str.capitalize)
+    page = st.sidebar.selectbox("Menu", options = tuple(PAGES.keys()), format_func=str.capitalize)
     PAGES[page]()
 
 def remove_page():
@@ -84,7 +82,7 @@ def second_page():
     # # Verifica se o usuário fez o upload do arquivo
     if file is not None:
         df = pd.read_csv(file)    
-        st.subheader('Tabela de dados')
+        st.subheader('Tabela dos dados')
         st.dataframe(df)
 
         if st.session_state['line_plot']:
@@ -103,10 +101,19 @@ def second_page():
             st.subheader('Grafico de pares')
             pair_plot(df)
 
+def third_page():
+    st.subheader("Processamento de Dados - WIP")
+    
+def fourth_page():
+    st.subheader("ML - WIP")
+    if st.session_state['knn']:
+        st.subheader("KNN - WIP")
 
 PAGES = {
     "settings": first_page,
     "data": second_page,
+    "data processing": third_page,
+    "machine learning": fourth_page,
 }
 
 if __name__ == "__main__":
