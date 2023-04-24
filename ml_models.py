@@ -1,25 +1,27 @@
+import streamlit as st
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 
-def train_model(data, target, test_size=0.2):
-    # Split data into train and test sets
-    X = data.drop(target, axis=1)
-    y = data['y']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
+def knn_models(X_train, X_test, y_train, y_test, n_neighbors=5):
+    from sklearn.neighbors import KNeighborsClassifier
 
-    # Scale data
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
+    # Instantiate the model
+    knn = KNeighborsClassifier(n_neighbors=n_neighbors)
 
-    return X_train, X_test, y_train, y_test
+    # Fit the model
+    knn.fit(X_train, y_train)
+
+    # Predict on test set
+    y_pred = knn.predict(X_test)
+
+    # Print classification report
+    print(classification_report(y_test, y_pred))
+    # show classification report in streamlit
+    st.subheader("Classification report")
+    st.write(classification_report(y_test, y_pred))
 
 def randon_florest_models(X_train, X_test, y_train, y_test):
     from sklearn.ensemble import RandomForestClassifier
-    from sklearn.model_selection import GridSearchCV
-    from sklearn.metrics import classification_report
 
     # Create a based model
     rf = RandomForestClassifier()
@@ -32,7 +34,6 @@ def randon_florest_models(X_train, X_test, y_train, y_test):
 
 def svm_models(X_train, X_test, y_train, y_test):
     from sklearn.svm import SVC
-    from sklearn.metrics import classification_report
 
     # Instantiate the model
     svm = SVC()
@@ -48,7 +49,6 @@ def svm_models(X_train, X_test, y_train, y_test):
 
 def linear_models(X_train, X_test, y_train, y_test):
     from sklearn.linear_model import LogisticRegression
-    from sklearn.metrics import classification_report
 
     # Instantiate the model
     logreg = LogisticRegression()
