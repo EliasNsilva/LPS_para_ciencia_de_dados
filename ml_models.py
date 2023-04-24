@@ -20,7 +20,7 @@ def knn_models(X_train, X_test, y_train, y_test, n_neighbors=5):
     st.subheader("Classification report")
     st.write(classification_report(y_test, y_pred))
 
-def randon_florest_models(X_train, X_test, y_train, y_test):
+def random_forest_models(X_train, X_test, y_train, y_test):
     from sklearn.ensemble import RandomForestClassifier
 
     # Create a based model
@@ -47,7 +47,7 @@ def svm_models(X_train, X_test, y_train, y_test):
     # Print classification report
     print(classification_report(y_test, y_pred))
 
-def linear_models(X_train, X_test, y_train, y_test):
+def logistic_regression_models(X_train, X_test, y_train, y_test):
     from sklearn.linear_model import LogisticRegression
 
     # Instantiate the model
