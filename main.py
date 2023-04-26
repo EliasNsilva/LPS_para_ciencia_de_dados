@@ -56,11 +56,14 @@ def first_page():
     with st.container():
         st.subheader('Escolha os módulos que deseja utilizar')
         pross = st.checkbox('Processamento de dados', key="pross")
-        viz = st.checkbox('Vizualização de dados', key="viz")
+        viz = st.checkbox('Visualização de dados', key="viz")
         ml = st.checkbox('Aprendizado de máquina', key="ml")
 
         if pross:
-            pass
+            st.subheader('Escolha processamento de dados')
+            st.checkbox('Remoção de dados faltantes', key="missing_data")
+            st.checkbox('Remoção de outliers', key="outliers")
+            st.checkbox('Transformação de dados categóricos', key="categorical_data")
         if viz:
             st.subheader('Escolha os tipos de gráficos')
             st.checkbox('Gráfico de linha', key="line_plot")
@@ -68,13 +71,29 @@ def first_page():
             st.checkbox('Gráfico de dispersão', key="scatter_plot")
             st.checkbox('Gráfico de pares', key="checkbox")
         if ml:
-            st.subheader('Escolha os modelos de aprendizado de máquina')
-            st.checkbox('KNN', key="knn")
-            st.checkbox('SVM', key="svm")
-            st.checkbox('Random Forest', key="random_forest")
-            st.checkbox('Logistic Regression', key="logistic_regression")
+            supervised = st.checkbox('Abordagens supervisionadas?')
+            if supervised:
+                st.subheader('Escolha os tipos de processamento de dados')
+                st.checkbox('Normalização', key="normalization")
+                st.checkbox('Padronização', key="standardization")
+                st.subheader('Escolha os modelos de aprendizado de máquina')
+                st.checkbox('KNN', key="knn")
+                st.checkbox('SVM', key="svm")
+                st.checkbox('Random Forest', key="random_forest")
+            else:
+                st.subheader('Escolha os tipos de processamento de dados')
+                st.checkbox('Redução de dimensionalidade PCA', key='dimensionality_reduction_PCA')
+                st.checkbox('Redução de dimensionalidade LDA', key='dimensionality_reduction_LDA')
+                st.subheader('Escolha os modelos de aprendizado de máquina')
+                st.checkbox('Logistic Regression', key="logistic_regression")
         
     st.button("Next", on_click=remove_page)
+
+def load_data():
+    df = pd.read_csv(file)    
+    st.subheader('Tabela dos dados')
+    st.dataframe(df)
+    return df
 
 def second_page():
     file = st.file_uploader("Upload do arquivo CSV", type="csv")
@@ -87,6 +106,16 @@ def second_page():
     st.session_state["bar_plot"] = st.session_state.get("bar_plot", False)
     st.session_state["scatter_plot"] = st.session_state.get("scatter_plot", False)
     st.session_state["pair_plot"] = st.session_state.get("pair_plot", False)
+
+    st.session_state["missing_data"] = st.session_state.get("missing_data", False)
+    st.session_state["outliers"] = st.session_state.get("outliers", False)
+    st.session_state["categorical_data"] = st.session_state.get("categorical_data", False)
+
+    st.session_state['supervised'] = st.session_state.get('supervised', False)
+    st.session_state["normalization"] = st.session_state.get("normalization", False)
+    st.session_state["standardization"] = st.session_state.get("standardization", False)
+    st.session_state["dimensionality_reduction_PCA"] = st.session_state.get("dimensionality_reduction_PCA", False)
+    st.session_state["dimensionality_reduction_LDA"] = st.session_state.get("dimensionality_reduction_LDA", False)
     
     st.session_state["knn"] = st.session_state.get("knn", False)
     st.session_state["svm"] = st.session_state.get("svm", False)
@@ -95,10 +124,8 @@ def second_page():
 
 
     # # Verifica se o usuário fez o upload do arquivo
-    if file is not None:
-        df = pd.read_csv(file)    
-        st.subheader('Tabela dos dados')
-        st.dataframe(df)
+    if df is not None:
+        df = load_data()
 
         if st.session_state['viz']:
             if st.session_state['line_plot']:
@@ -117,12 +144,45 @@ def second_page():
                 st.subheader('Grafico de pares')
                 pair_plot(df)
         
+        if st.session_state['pross']:
+            if st.session_state['missing_data']:
+                st.subheader('Remoção de dados faltantes')
+                df = remove_missing_data(df)
+
+            if st.session_state['outliers']:
+                st.subheader('Remoção de outliers')
+                df = remove_outliers(df)
+
+            if st.session_state['categorical_data']:
+                st.subheader('Transformação de dados categóricos')
+                df = convert_with_get_dummies(df)
+        
         if st.session_state['ml']:
             with st.form(key='form_ml'):
                 st.subheader('Aprendizado de máquina')
-                target = st.selectbox('Selecione a variável alvo', df.columns)
-                test_size = st.number_input('Tamanho do conjunto de teste', min_value=0.0, max_value=1.0, value=0.2)
-                X_train, X_test, y_train, y_test = split_data(df, target, test_size)
+
+                if st.session_state['supervised']:
+                    target = st.selectbox('Selecione a variável alvo', df.columns)
+                    test_size = st.number_input('Tamanho do conjunto de teste', min_value=0.0, max_value=1.0, value=0.2)
+                    X_train, X_test, y_train, y_test = split_data_supervised(df, target, test_size)
+
+                    if st.session_state['normalization']:
+                        st.subheader('Normalização')
+                        df = normalization(X_train, X_test)
+                    if st.session_state['standardization']:
+                        st.subheader('Padronização')
+                        df = standardization(X_train, X_test)
+                else:
+                    test_size = st.number_input('Tamanho do conjunto de teste', min_value=0.0, max_value=1.0, value=0.2)
+                    X_train, X_test = split_data_unsupervised(df, test_size)
+
+                    if st.session_state['dimensionality_reduction_PCA']:
+                        st.subheader('Redução de dimensionalidade PCA')
+                        df = reduce_data_with_pca(X_train, X_test)
+                    if st.session_state['dimensionality_reduction_LDA']:
+                        st.subheader('Redução de dimensionalidade LDA')
+                        df = reduce_data_with_lda(X_train, X_test)
+                
                 submit = st.form_submit_button(label='Submit')
                 
                 if submit:
@@ -132,10 +192,10 @@ def second_page():
                         knn_models(X_train, X_test, y_train, y_test, n_neighbors)
                     if st.session_state['svm']:
                         st.subheader('SVM')
-                        svm_models(X_train, X_test, y_train, y_test)
+                        svm_classifier(X_train, X_test, y_train, y_test)
                     if st.session_state['random_forest']:
                         st.subheader('Random Forest')
-                        random_forest_models(X_train, X_test, y_train, y_test)
+                        random_forest_classifier(X_train, X_test, y_train, y_test)
                     if st.session_state['logistic_regression']:
                         st.subheader('Logistic Regression')
                         logistic_regression_models(X_train, X_test, y_train, y_test)
@@ -150,7 +210,7 @@ def fourth_page():
 
 PAGES = {
     "settings": first_page,
-    "data": second_page,
+    "data analysis": second_page,
     "data processing": third_page,
     "machine learning": fourth_page,
 }

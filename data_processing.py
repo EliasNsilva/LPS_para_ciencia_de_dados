@@ -1,14 +1,36 @@
 import streamlit as st
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+import seaborn as sns
 import pandas as pd
 
-def split_data(data, target, test_size=0.2):
+def split_data_supervised(data, target, test_size=0.2):
     # Split data into train and test sets
     X = data.drop(target, axis=1)
     y = data[target]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
     return X_train, X_test, y_train, y_test
+
+def split_data_unsupervised(data, test_size=0.2):
+    # Split data into train and test sets
+    X_train, X_test = train_test_split(data, test_size=test_size, random_state=0)
+    return X_train, X_test
+
+def remove_missing_data(data):
+    # Missing data
+    st.subheader("Dados faltantes")
+    st.dataframe(data.isnull().sum())
+    remove =  st.checkbox("Remover dados faltantes?")
+    if remove:
+        data.dropna(inplace=True)
+    
+    return data
+
+def remove_outliers(data):
+    plt.figure(figsize=(20, 10))
+    sns.boxplot(data=data, orient="h", palette="Set2")
+    st.pyplot()
 
 def convert_with_get_dummies(data, columns):
     # Convert categorical variable into dummy/indicator variables
@@ -17,14 +39,14 @@ def convert_with_get_dummies(data, columns):
     st.dataframe(data)
     return data
 
-def scale_data(X_train, X_test):
+def standardization(X_train, X_test):
     # Scale data
     sc = StandardScaler()
     X_train = sc.fit_transform(X_train)
     X_test = sc.transform(X_test)
     return X_train, X_test
 
-def normalize_data(X_train, X_test):
+def normalization(X_train, X_test):
     # Normalize data
     from sklearn.preprocessing import Normalizer
 
@@ -33,7 +55,7 @@ def normalize_data(X_train, X_test):
     X_test = normalizer.transform(X_test)
     return X_train, X_test
 
-def reduce_data(X_train, X_test, y_train, y_test, n_components=2):
+def reduce_data_with_pca(X_train, X_test, y_train, y_test, n_components=2):
     # Reduce data
     from sklearn.decomposition import PCA
 
