@@ -5,6 +5,18 @@ import seaborn as sns
 import streamlit as st
 import matplotlib.pyplot as plt
 
+st.set_page_config(page_title="LPS", initial_sidebar_state="collapsed")
+st.markdown(
+    """
+<style>
+    [data-testid="collapsedControl"] {
+        display: none
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
 def load_settings():
     if os.path.exists('settings.json'):
         with open('settings.json', 'r') as f:
@@ -38,7 +50,7 @@ def pair_plot(df):
     st.pyplot(fig)
 
 
-def main():
+if __name__ == "__main__":
     options = load_settings()
 
     file = st.file_uploader("Upload do arquivo CSV", type="csv")
@@ -50,7 +62,7 @@ def main():
         if options['line_plot']:
             line_plot(df)
         if options['bar_plot']:
-            line_plot(df)
+            bar_plot(df)
         if options['scatter_plot']:
             scatter_plot(df)
         if options['pair_plot']:
