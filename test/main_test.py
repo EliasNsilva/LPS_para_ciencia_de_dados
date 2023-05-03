@@ -1,14 +1,22 @@
 import json
 import streamlit as st
-from plotting import main
 from streamlit_extras.switch_page_button import switch_page
-
-st.set_page_config(page_title="LPS")
-
-options = {}
-
 import streamlit as st
 import json
+
+st.set_page_config(page_title="LPS", initial_sidebar_state="collapsed")
+st.markdown(
+    """
+<style>
+    [data-testid="collapsedControl"] {
+        display: none
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+options = {}
 
 def send_button():
     if 'button' not in st.session_state:
@@ -46,7 +54,7 @@ def first_page():
             options['scatter_plot'] = scatter_plot
 
             checkbox = st.checkbox('Gráfico de pares', key="checkbox")
-            options['checkbox'] = checkbox
+            options['pair_plot'] = checkbox
 
         if ml:
             options['ml'] = ml
@@ -89,19 +97,18 @@ def first_page():
     if st.button('Selecionar'):
         st.session_state.button = True 
 
-def plot():
-    main()
-    
-
-pages = {
-    "Plot": plot()
-}
-
 if __name__ == "__main__":
     send_button()
     first_page()
 
     if st.session_state.button:
         if options['viz']:
-            switch_page("Plot")
+            if options['pross']:
+                switch_page("data_processing")
+            switch_page("plotting")
+        elif options['ml']:
+            if options['pross']:
+                switch_page("data_processing")
+            switch_page("machine_learning")
+    
 
