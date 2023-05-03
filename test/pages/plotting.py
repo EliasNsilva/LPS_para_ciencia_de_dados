@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import streamlit as st
 import matplotlib.pyplot as plt
+from streamlit_extras.switch_page_button import switch_page
 
 st.set_page_config(page_title="LPS", initial_sidebar_state="collapsed")
 st.markdown(
@@ -67,3 +68,8 @@ if __name__ == "__main__":
             scatter_plot(df)
         if options['pair_plot']:
             pair_plot(df)
+        
+        if options['ml']:
+            go_next = st.button("Machine Learning")
+            if go_next:
+                switch_page("machine_learning")

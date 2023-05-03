@@ -25,12 +25,15 @@ def send_button():
 def first_page():
     with st.container():
         st.subheader('Escolha os módulos que deseja utilizar')
-        viz = st.checkbox('Visualização de dados', key="viz")
         pross = st.checkbox('Processamento de dados', key="pross")
+        viz = st.checkbox('Visualização de dados', key="viz")
         ml = st.checkbox('Aprendizado de máquina', key="ml")
+        options['pross'] = pross
+        options['viz'] = viz
+        options['ml'] = ml
 
         if pross:
-            options['pross'] = pross
+            #options['pross'] = pross
             st.subheader('Escolha processamento de dados')
             missing_data = st.checkbox('Remoção de dados faltantes', key="missing_data") 
             options['missing_data'] = missing_data
@@ -42,7 +45,7 @@ def first_page():
             options['categorical_data'] = categorical_data
 
         if viz:
-            options['viz'] = viz
+            #options['viz'] = viz
             st.subheader('Escolha os tipos de gráficos')
             line_plot = st.checkbox('Gráfico de linha', key="line_plot")
             options['line_plot'] = line_plot
@@ -57,39 +60,57 @@ def first_page():
             options['pair_plot'] = checkbox
 
         if ml:
-            options['ml'] = ml
-            supervised = st.checkbox('Abordagens supervisionadas?')
-            options['supervised'] = supervised
+            #options['ml'] = ml
+            approach = st.selectbox('Escolha o tipo de abordagem', ['Supervisionado', 'Não supervisionado'], key='approach')
+            options['approach'] = approach
 
-            if supervised:
+            if approach == 'Supervisionado':
                 st.subheader('Escolha os tipos de processamento de dados')
-                normalization = st.checkbox('Normalização', key="normalization")
-                options['normalization'] = normalization
+                options['processing_super'] = st.selectbox('Escolha o tipo de abordagem', ['Sem processamento', 'Normalização', 'Padronização'], key='processing_unsuper')
+                
+                # normalization = st.checkbox('Normalização', key="normalization")
+                # options['normalization'] = normalization
 
-                standardization = st.checkbox('Padronização', key="standardization")
-                options['standardization'] = standardization
+                # standardization = st.checkbox('Padronização', key="standardization")
+                # options['standardization'] = standardization
+
+                # options['processing_super'] = st.checkbox('Sem processamento', key="no_processing_super")
 
                 st.subheader('Escolha os modelos de aprendizado de máquina')
                 knn = st.checkbox('KNN', key="knn")
                 options['knn'] = knn
 
                 svm = st.checkbox('SVM', key="svm")
-                options['svm'] = svm
+                options['svm_classifier'] = svm
 
                 random_forest = st.checkbox('Random Forest', key="random_forest")
-                options['random_forest'] = random_forest
+                options['random_forest_classifier'] = random_forest
 
-            else:
+            elif approach == 'Não supervisionado':
                 st.subheader('Escolha os tipos de processamento de dados')
-                dimensionality_reduction_PCA = st.checkbox('Redução de dimensionalidade PCA', key='dimensionality_reduction_PCA')
-                options['dimensionality_reduction_PCA'] = dimensionality_reduction_PCA
+                
+                options['processing_unsuper'] = st.selectbox('Escolha o tipo de abordagem', ['Sem processamento', 'PCA', 'LDA'], key='processing_unsuper')
 
-                dimensionality_reduction_LDA = st.checkbox('Redução de dimensionalidade LDA', key='dimensionality_reduction_LDA')
-                options['dimensionality_reduction_LDA'] = dimensionality_reduction_LDA
+                # dimensionality_reduction_PCA = st.checkbox('Redução de dimensionalidade PCA', key='dimensionality_reduction_PCA')
+                # options['dimensionality_reduction_PCA'] = dimensionality_reduction_PCA
+
+                # dimensionality_reduction_LDA = st.checkbox('Redução de dimensionalidade LDA', key='dimensionality_reduction_LDA')
+                # options['dimensionality_reduction_LDA'] = dimensionality_reduction_LDA
+
+                # options['processing_unsuper'] = st.checkbox('Sem processamento', key="no_processing_unsuper")
 
                 st.subheader('Escolha os modelos de aprendizado de máquina')
                 logistic_regression = st.checkbox('Logistic Regression', key="logistic_regression")
                 options['logistic_regression'] = logistic_regression
+
+                kmeans = st.checkbox('K-Means', key="kmeans")
+                options['kmeans'] = kmeans
+
+                svm = st.checkbox('SVM', key="svm_regressor")
+                options['svm_regressor'] = svm
+
+                random_forest = st.checkbox('Random Forest', key="random_forest_regressor")
+                options['random_forest_regressor'] = random_forest
 
     with open('settings.json', 'w') as f:
         json.dump(options, f)

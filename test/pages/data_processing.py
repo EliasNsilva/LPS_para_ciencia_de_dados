@@ -55,9 +55,9 @@ def remove_missing_data(data):
     return data
 
 def remove_outliers(data):
-    plt.figure(figsize=(20, 10))
+    fig = plt.figure(figsize=(20, 10))
     sns.boxplot(data=data, orient="h", palette="Set2")
-    st.pyplot()
+    st.pyplot(fig)
 
 def convert_with_get_dummies(data, columns):
     # Convert categorical variable into dummy/indicator variables
@@ -82,7 +82,7 @@ def normalization(X_train, X_test):
     X_test = normalizer.transform(X_test)
     return X_train, X_test
 
-def reduce_data_with_pca(X_train, X_test, y_train, y_test, n_components=2):
+def reduce_data_with_pca(X_train, X_test, n_components=2):
     # Reduce data
     from sklearn.decomposition import PCA
 
@@ -90,17 +90,17 @@ def reduce_data_with_pca(X_train, X_test, y_train, y_test, n_components=2):
     X_train = pca.fit_transform(X_train)
     X_test = pca.transform(X_test)
     explained_variance = pca.explained_variance_ratio_
-    return X_train, X_test, y_train, y_test, explained_variance
+    return X_train, X_test, explained_variance
 
-def reduce_data_with_lda(X_train, X_test, y_train, y_test, n_components=2):
+def reduce_data_with_lda(X_train, X_test, n_components=2):
     # Reduce data
     from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 
     lda = LDA(n_components=n_components)
-    X_train = lda.fit_transform(X_train, y_train)
+    X_train = lda.fit_transform(X_train)
     X_test = lda.transform(X_test)
     explained_variance = lda.explained_variance_ratio_
-    return X_train, X_test, y_train, y_test, explained_variance
+    return X_train, X_test, explained_variance
 
 if __name__ == "__main__":
     send_button()

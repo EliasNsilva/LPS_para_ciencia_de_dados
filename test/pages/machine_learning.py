@@ -1,6 +1,29 @@
+from sklearn.metrics import classification_report
 import streamlit as st
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+import os 
+import json
+
+from data_processing import *
+
+st.set_page_config(page_title="LPS", initial_sidebar_state="collapsed")
+st.markdown(
+    """
+<style>
+    [data-testid="collapsedControl"] {
+        display: none
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+def load_settings():
+    if os.path.exists('settings.json'):
+        with open('settings.json', 'r') as f:
+            return json.load(f)
+    else:
+        return {}
 
 def knn_models(X_train, X_test, y_train, y_test, n_neighbors=5):
     from sklearn.neighbors import KNeighborsClassifier
@@ -103,3 +126,42 @@ def logistic_regression_models(X_train, X_test, y_train, y_test):
 
     # Print classification report
     print(classification_report(y_test, y_pred))
+
+if __name__ == "__main__":
+    options = load_settings()
+    df = pd.read_csv(options['filename'])
+
+    if options['approach'] == 'Supervisionado':
+        with st.form(key='my_form'):
+            target = st.selectbox('Selecione a coluna alvo', df.columns)
+            submited = st.form_submit_button(label='ok')
+        if submited:
+            X_train, X_test, y_train, y_test = split_data_supervised(df, options['target'])
+            if options['processing_super'] != 'Sem processamento':
+                processing_super = options['processing_super']
+                if processing_super == 'Normalização':
+                    X_train, X_test = normalization(X_train, X_test)
+                if processing_super == 'Padronização':
+                    X_train, X_test = standardization(X_train, X_test)
+            if options['knn']:
+                knn_models(X_train, X_test, y_train, y_test)
+            if options['random_forest_classifier']:
+                random_forest_classifier(X_train, X_test, y_train, y_test)
+            if options['svm_classifier']:
+                svm_classifier(X_train, X_test, y_train, y_test)
+    if options['approach'] == 'Não supervisionado':
+        X_train, X_test = split_data_unsupervised(df)
+        if options['processing_unsuper'] != 'Sem processamento':
+            processing_unsuper = options['processing_unsuper']
+            if processing_unsuper == 'PCA':
+                X_train, X_test , explained_variance = reduce_data_with_pca(X_train, X_test)
+            if processing_unsuper == 'LDA':
+                X_train, X_test, explained_variance = reduce_data_with_lda(X_train, X_test)
+        if options['kmeans']:
+            kmeans_models(X_train, X_test, y_train, y_test)
+        if options['random_forest_regressor']:
+            random_forest_regressor(X_train, X_test, y_train, y_test)
+        if options['svm_regressor']:
+            svm_regressor(X_train, X_test, y_train, y_test)
+        if options['logistic_regression']:
+            logistic_regression_models(X_train, X_test, y_train, y_test)
