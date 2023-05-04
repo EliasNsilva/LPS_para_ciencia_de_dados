@@ -102,39 +102,85 @@ def reduce_data_with_lda(X_train, X_test, n_components=2):
     explained_variance = lda.explained_variance_ratio_
     return X_train, X_test, explained_variance
 
+def remove_columns(df):
+    columns = list(df.columns)
+    columns_to_remove = []
+
+    if len(columns) == 0:
+        st.write("Não há mais colunas para remover")
+        return
+    
+    column_to_remove = st.selectbox(
+        f"Selecione uma coluna para remover ({len(columns)} restantes)", 
+        options=columns,
+        key=hash("colselect"))
+
+    if st.button("Remover", key=hash("remove")):            
+        columns_to_remove.append(column_to_remove)
+        columns.remove(column_to_remove)
+        df.drop(columns=columns_to_remove, inplace=True)
+        st.write('Dataset após remoção de coluna')
+        st.write(df)
+
+def settings():
+    st.subheader('Escolha as opções de processamento de dados')
+    missing_data = st.checkbox('Remoção de dados faltantes', key="missing_data") 
+    options['missing_data'] = missing_data
+
+    outliers = st.checkbox('Remoção de outliers', key="outliers")
+    options['outliers'] = outliers
+
+    categorical_data = st.checkbox('Transformação de dados categóricos', key="categorical_data")
+    options['categorical_data'] = categorical_data
+
+    remove_column = st.checkbox('Remover coluna do dataframe', key="remove_column")
+    options['remove_column'] = remove_column
+
+    if options['missing_data'] or options['outliers'] or options['categorical_data'] or options['remove_column']:
+        return True
+
 if __name__ == "__main__":
     send_button()
     options = load_settings()
+    flag_settings = False
+    flag_settings = settings()
 
-    file = st.file_uploader("Upload do arquivo CSV", type="csv")
+    if flag_settings:
+        file = st.file_uploader("Upload do arquivo CSV", type="csv")
 
-    if file is not None:
-        df = pd.read_csv(file)
-        #Pegando o nome do arquivo
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            temp_file.write(file.read())
-            file_path = temp_file.name
+        if file is not None:
+            df = pd.read_csv(file)
+            st.write(df)
+            #Pegando o nome do arquivo
+            with tempfile.NamedTemporaryFile(delete=True) as temp_file:
+                temp_file.write(file.read())
+                file_path = temp_file.name
 
-        filename = os.path.basename(file_path)
+            filename = os.path.basename(file_path)
 
-        if options['missing_data']:
-            df = remove_missing_data(df)
-        if options['outliers']:
-            remove_outliers(df)
-        if options['categorical_data']:
-            df = convert_with_get_dummies(df)
+            if options['missing_data']:
+                df = remove_missing_data(df)
+            if options['outliers']:
+                remove_outliers(df)
+            if options['categorical_data']:
+                df = convert_with_get_dummies(df)
+            if options['remove_column']:
+                remove_columns(df)
 
-    if st.button('Aplicar'):
-        st.session_state.button_pross = True 
-    
-    if st.session_state.button_pross:
-        df.to_csv(os.getcwd() + '/' + filename + '.csv', index=False)
-        options['filename'] = filename + '.csv'
 
-        with open('settings.json', 'w') as f:
-            json.dump(options, f)
+        if st.button('Concluir'):
+            st.session_state.button_pross = True 
+        
+        if st.session_state.button_pross:
+            df.to_csv(os.getcwd() + '/' + filename + '.csv', index=False)
+            options['filename'] = os.getcwd() + '/' + filename + '.csv'
 
-        if options['viz']:
-            switch_page("plotting")
-        elif options['ml']:
-            switch_page("machine_learning")
+            with open('settings.json', 'w') as f:
+                json.dump(options, f)
+
+            if options['viz']:
+                switch_page("plotting")
+            elif options['ml']:
+                switch_page("machine_learning")
+            else:
+                st.write('Operação concluída com sucesso!')
