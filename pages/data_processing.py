@@ -29,8 +29,8 @@ def load_settings():
 def save_file(df):
     df.to_csv('data.csv', index=False)
 
-def remove_missing_data():
-    data = pd.read_csv('data.csv')
+def remove_missing_data(data):
+    #data = pd.read_csv('data.csv')
     # Missing data
     st.subheader("Dados faltantes")
     st.dataframe(data.isnull().sum())
@@ -40,8 +40,8 @@ def remove_missing_data():
         save_file(data)
 
 
-def remove_outliers():
-    data = pd.read_csv('data.csv')
+def remove_outliers(data):
+    #data = pd.read_csv('data.csv')
 
     fig = plt.figure(figsize=(20, 10))
     sns.boxplot(data=data, orient="h", palette="Set2")
@@ -64,8 +64,8 @@ def remove_outliers():
         save_file(data)
 
 
-def convert_with_get_dummies():
-    data = pd.read_csv('data.csv')
+def convert_with_get_dummies(data):
+    #data = pd.read_csv('data.csv')
     # Convert categorical variable into dummy/indicator variables
     with st.form(key='form_dummies'):
         columns = st.multiselect("Selecione as colunas para converter com get_dummies", list(data.columns))
@@ -76,8 +76,8 @@ def convert_with_get_dummies():
         st.dataframe(data)
         save_file(data)
 
-def convert_with_label_encoder():
-    data = pd.read_csv('data.csv')
+def convert_with_label_encoder(data):
+    #data = pd.read_csv('data.csv')
     # Convert categorical variable into dummy/indicator variables
     with st.form(key='form_encoder'):
         columns = st.multiselect("Selecione as colunas para converter com LabelEncoder", list(data.columns))
@@ -91,8 +91,8 @@ def convert_with_label_encoder():
         st.dataframe(data)
         save_file(data)
 
-def remove_columns():
-    df = pd.read_csv('data.csv')
+def remove_columns(df):
+    #df = pd.read_csv('data.csv')
 
     columns = list(df.columns)
     columns_to_remove = []
@@ -120,19 +120,19 @@ if __name__ == "__main__":
     if file is not None:
         st.write("Arquivo carregado com sucesso!")
         df = pd.read_csv(file)
-        df.to_csv('data.csv', index=False)
+        #df.to_csv('data.csv', index=False)
         st.dataframe(df)
 
         if options['missing_data']:
-            remove_missing_data()
+            remove_missing_data(df)
         if options['outliers']:
-            remove_outliers()
+            remove_outliers(df)
         if options['categorical_data']:
-            convert_with_get_dummies()
+            convert_with_get_dummies(df)
         if options['remove_column']:
-            remove_columns()
+            remove_columns(df)
         if options['encode_data']:
-            convert_with_label_encoder()
+            convert_with_label_encoder(df)
 
     if st.button('Concluir'):
         options['file'] = True

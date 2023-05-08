@@ -2,7 +2,7 @@ import json
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
 import streamlit as st
-import json
+import pandas as pd
 
 st.set_page_config(page_title="LPS", initial_sidebar_state="collapsed")
 st.markdown(
@@ -114,11 +114,17 @@ if __name__ == "__main__":
     if st.session_state.button:
         if options['viz']:
             if options['pross']:
+                df = pd.DataFrame()
+                df.to_csv('data.csv', index=False)
                 switch_page("data_processing")
             switch_page("plotting")
         elif options['ml']:
             if options['pross']:
+                df = pd.DataFrame()
+                df.to_csv('data.csv', index=False)
                 switch_page("data_processing")
             switch_page("machine_learning")
+        elif options['pross']:
+            switch_page("data_processing")
     
 
