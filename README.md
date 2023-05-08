@@ -5,7 +5,7 @@ Nesse repositório você encontrará uma LPS desenvolvida em python.
 1. Clone o repositório
 2. Instale as dependências
 
-    ```pip -r requirements.txt```
+    ```pip install -r requirements.txt```
     
 3. Execute o projeto
 
