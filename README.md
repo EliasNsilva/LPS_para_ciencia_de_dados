@@ -1,5 +1,5 @@
 # Linha de Produto de Software para Ciencia de Dados
-Nesse repositório você encontrará uma LPS desenvolvida em python.
+Nesse repositório você encontrará uma LPS desenvolvida em Python.
 
 ## Rodando o projeto:
 1. Clone o repositório
