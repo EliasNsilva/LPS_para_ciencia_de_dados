@@ -9,4 +9,4 @@ Nesse repositório você encontrará uma LPS desenvolvida em Python.
     
 3. Execute o projeto
 
-    ```streamlit run app.py```
+    ```streamlit run main.py```
